@@ -26,11 +26,11 @@ public class SecurityJpaConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/product/form").hasRole("ADMIN")
                         .requestMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
-                        .requestMatchers("/product/*").hasAnyRole("ADMIN", "GUEST")
-                        .requestMatchers("/categories/*").hasAnyRole("ADMIN", "GUEST")
+                        .requestMatchers("/api/*").hasAnyRole("ADMIN", "GUEST")
+                        .requestMatchers("/workouts/*").hasAnyRole("ADMIN", "GUEST")
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
