@@ -39,6 +39,7 @@ public class SecurityJpaConfig {
                                 .loginPage("/login")
                                 .permitAll()
                                 .loginProcessingUrl("/perform_login")
+                                .successHandler((request, response, authentication) -> response.sendRedirect("/sessions"))
                 )
                 .exceptionHandling(ex -> ex.accessDeniedPage("/access_denied"))
                 .build();

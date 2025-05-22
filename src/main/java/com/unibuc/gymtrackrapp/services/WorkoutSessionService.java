@@ -1,6 +1,7 @@
 package com.unibuc.gymtrackrapp.services;
 
 import com.unibuc.gymtrackrapp.domain.WorkoutSession;
+import com.unibuc.gymtrackrapp.domain.security.User;
 import com.unibuc.gymtrackrapp.repositories.WorkoutSessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,10 @@ public class WorkoutSessionService {
     private final WorkoutSessionRepository sessionRepository;
     public List<WorkoutSession> getAllSessions() {
         return sessionRepository.findAll();
+    }
+
+    public List<WorkoutSession> getAllSessionsOfUser(String email) {
+        return sessionRepository.findAllByUserEmail(email);
     }
 
     public WorkoutSession getSession(UUID id) {
