@@ -2,6 +2,9 @@ package com.unibuc.gymtrackrapp.controllers;
 
 import com.unibuc.gymtrackrapp.config.Log;
 import com.unibuc.gymtrackrapp.domain.Workout;
+import com.unibuc.gymtrackrapp.domain.WorkoutSet;
+import com.unibuc.gymtrackrapp.dtos.WorkoutCreateDTO;
+import com.unibuc.gymtrackrapp.services.ExerciseService;
 import com.unibuc.gymtrackrapp.services.WorkoutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,37 +21,37 @@ import java.util.UUID;
 public class WorkoutController {
 
     private final WorkoutService workoutService;
+    private final ExerciseService exerciseService;
 
     @Log
     @GetMapping( "/create")
     public String showWorkoutForm(Model model) {
-        model.addAttribute("workout", new Workout());
+        model.addAttribute("workoutCreateDTO", new WorkoutCreateDTO());
+        model.addAttribute("exercises", exerciseService.getAllExercises());
+
         return "create-workout";
     }
 
     @PostMapping
-    public String saveWorkout(@ModelAttribute Workout workout) {
+    public String saveWorkout(@ModelAttribute WorkoutCreateDTO workoutDTO) {
+        Workout workout = new Workout();
+        workout.setName(workoutDTO.getName());
+        workout.setDescription(workoutDTO.getDescription());
+        
+        List<WorkoutSet> sets = workoutDTO.getSets().stream()
+            .map(setDTO -> {
+                WorkoutSet set = new WorkoutSet();
+                set.setWorkout(workout);
+                set.setExercise(exerciseService.getExercise(setDTO.getExerciseId()));
+                set.setWeight(setDTO.getWeight());
+                set.setReps(setDTO.getReps());
+                return set;
+            })
+            .collect(Collectors.toList());
+        
+        workout.setSets(sets);
         workoutService.saveWorkout(workout);
         return "redirect:/sessions";
     }
 
-//    @GetMapping
-//    public List<Workout> getAll() {
-//        return workoutService.getAllWorkouts();
-//    }
-//
-//    @GetMapping("/{id}")
-//    public Workout getById(@PathVariable UUID id) {
-//        return workoutService.getWorkout(id);
-//    }
-//
-//    @PostMapping
-//    public Workout create(@RequestBody Workout workout) {
-//        return workoutService.saveWorkout(workout);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public void delete(@PathVariable UUID id) {
-//        workoutService.deleteWorkout(id);
-//    }
 }

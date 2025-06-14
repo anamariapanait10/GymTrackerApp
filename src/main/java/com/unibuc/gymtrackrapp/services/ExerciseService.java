@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,5 +19,9 @@ public class ExerciseService {
 
     public Exercise saveExercise(Exercise exercise) {
         return exerciseRepository.save(exercise);
+    }
+
+    public Exercise getExercise(UUID exerciseId) {
+        return exerciseRepository.findById(exerciseId).orElse(null);
     }
 }

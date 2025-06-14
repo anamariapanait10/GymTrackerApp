@@ -10,8 +10,6 @@ import lombok.Setter;
 public class WorkoutSessionDTO {
     private String workoutName;
     private String date;
-    private String duration;
-    private String caloriesBurned;
     private String notes;
     private String exercises;
 }

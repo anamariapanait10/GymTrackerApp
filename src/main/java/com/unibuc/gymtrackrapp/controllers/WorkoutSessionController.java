@@ -4,6 +4,9 @@ import com.unibuc.gymtrackrapp.config.Log;
 import com.unibuc.gymtrackrapp.domain.Workout;
 import com.unibuc.gymtrackrapp.domain.WorkoutSession;
 import com.unibuc.gymtrackrapp.domain.security.User;
+import com.unibuc.gymtrackrapp.dtos.WorkoutCreateDTO;
+import com.unibuc.gymtrackrapp.dtos.WorkoutSessionDTO;
+import com.unibuc.gymtrackrapp.dtos.WorkoutSetDTO;
 import com.unibuc.gymtrackrapp.services.UserService;
 import com.unibuc.gymtrackrapp.services.WorkoutService;
 import com.unibuc.gymtrackrapp.services.WorkoutSessionService;
@@ -59,16 +62,6 @@ public class WorkoutSessionController {
         return "workouts";
     }
 
-//    @GetMapping
-//    public List<WorkoutSession> getAll() {
-//        return workoutSessionService.getAllSessions();
-//    }
-//
-//    @GetMapping("/{id}")
-//    public WorkoutSession getById(@PathVariable UUID id) {
-//        return workoutSessionService.getSession(id);
-//    }
-//
     @PostMapping
     public String saveWorkoutSession(@ModelAttribute WorkoutSession session) {
         String username = UserAuthenticationUtils.getLoggedUsername();
@@ -77,9 +70,4 @@ public class WorkoutSessionController {
         workoutSessionService.saveSession(session);
         return "redirect:/sessions";
     }
-//
-//    @DeleteMapping("/{id}")
-//    public void delete(@PathVariable UUID id) {
-//        workoutSessionService.deleteSession(id);
-//    }
 }
