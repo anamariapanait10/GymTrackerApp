@@ -3,6 +3,8 @@
 <head>
     <title>Workout Calendar</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
         .calendar {
             display: grid;
@@ -29,42 +31,8 @@
     </style>
 </head>
 <body>
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Create workout session</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form th:action="@{/sessions}" th:object="${workoutSession}" method="post">
-                    <div class="modal-body">
-                        <input type="hidden" id="selectedDate" name="date">
-                        <div class="mb-3">
-                            <label for="workoutSelect" class="form-label">Select Workout</label>
-                            <select class="form-select" id="workoutSelect" name="workoutId" th:field="*{workout}">
-                                <option th:each="workout : ${workouts}"
-                                        th:value="${workout.id}"
-                                        th:text="${workout.name}">Workout
-                                </option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Notes (optional)</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3" th:field="*{notes}"
-                                      placeholder="Any comments or goals for this session..."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
 <div class="container mt-4">
-
     <!-- Header with Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <a th:href="@{/sessions(year=${prevMonth.year}, month=${prevMonth.monthValue})}"
@@ -100,9 +68,10 @@
             <th:block th:each="day : ${#numbers.sequence(1, daysInMonth)}">
                 <th:block th:with="date=${T(java.time.LocalDate).of(year, month, day)}">
                     <div th:class="'calendar-day ' + (${sessions.containsKey(date)} ? 'has-session' : '')"
-                         data-bs-toggle="modal" data-bs-target="#exampleModal"
-                         th:attr="data-date=${date}"
-                         onclick="document.getElementById('selectedDate').value = this.getAttribute('data-date')">
+                         data-bs-toggle="modal"
+                         th:attr="data-bs-target=${sessions.containsKey(date)} ? '#editModal' : '#createModal',
+                                 data-date=${date}"
+                         th:onclick="'document.getElementById(\'' + (${sessions.containsKey(date)} ? 'editSelectedDate' : 'selectedDate') + '\').value = this.getAttribute(\'data-date\')'">
                         <span th:text="${day}"></span>
                         <span th:if="${sessions.containsKey(date)}"
                               th:text="${sessions.get(date).getWorkout().getName()}"></span>
@@ -116,5 +85,98 @@
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
         crossorigin="anonymous"></script>
 
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createModalLabel">Create workout session</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/sessions}" th:object="${workoutSession}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="selectedDate" name="date">
+                    <div class="mb-3">
+                        <label for="workoutSelect" class="form-label">Select Workout</label>
+                        <select class="form-select" id="workoutSelect" name="workoutId" th:field="*{workout}">
+                            <option th:each="workout : ${workouts}"
+                                    th:value="${workout.id}"
+                                    th:text="${workout.name}">Workout
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes (optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" th:field="*{notes}"
+                                  placeholder="Any comments or goals for this session..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editModalLabel">Edit workout session</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/sessions}" th:object="${workoutSession}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editSelectedDate" name="date">
+                    <div class="mb-3">
+                        <label for="editWorkoutSelect" class="form-label">Select Workout</label>
+                        <select class="form-select" id="editWorkoutSelect" name="workoutId" th:field="*{workout}">
+                            <option th:each="workout : ${workouts}"
+                                    th:value="${workout.id}"
+                                    th:text="${workout.name}">Workout
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNotes" class="form-label">Notes (optional)</label>
+                        <textarea class="form-control" id="editNotes" name="notes" rows="3" th:field="*{notes}"
+                                  placeholder="Any comments or goals for this session..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="deleteSession()">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteSession() {
+        if (!confirm('Are you sure you want to delete this session?'))
+            return;
+
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        let date = document.getElementById('editSelectedDate').value;
+        let url = '/sessions/' + date;
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                [header]: token
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Failed to delete session');
+            }
+        })
+    }
+</script>
 </body>
 </html>

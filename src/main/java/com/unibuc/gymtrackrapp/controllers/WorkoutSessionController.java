@@ -4,17 +4,12 @@ import com.unibuc.gymtrackrapp.config.Log;
 import com.unibuc.gymtrackrapp.domain.Workout;
 import com.unibuc.gymtrackrapp.domain.WorkoutSession;
 import com.unibuc.gymtrackrapp.domain.security.User;
-import com.unibuc.gymtrackrapp.dtos.WorkoutCreateDTO;
-import com.unibuc.gymtrackrapp.dtos.WorkoutSessionDTO;
-import com.unibuc.gymtrackrapp.dtos.WorkoutSetDTO;
 import com.unibuc.gymtrackrapp.services.UserService;
 import com.unibuc.gymtrackrapp.services.WorkoutService;
 import com.unibuc.gymtrackrapp.services.WorkoutSessionService;
 import com.unibuc.gymtrackrapp.utils.UserAuthenticationUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +18,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -41,14 +37,6 @@ public class WorkoutSessionController {
 
         String username = UserAuthenticationUtils.getLoggedUsername();
 
-        Map<LocalDate, WorkoutSession> sessions = workoutSessionService.getAllSessionsOfUser(username).stream()
-                .collect(Collectors.toMap(WorkoutSession::getDate, session -> session));
-
-        model.addAttribute("sessions", sessions);
-
-        List<Workout> workouts = workoutService.getAllWorkouts();
-        model.addAttribute("workouts", workouts);
-
         YearMonth currentMonth = (year != null && month != null)
                 ? YearMonth.of(year, month)
                 : YearMonth.now();
@@ -58,6 +46,15 @@ public class WorkoutSessionController {
         model.addAttribute("currentMonth", currentMonth);
         model.addAttribute("prevMonth", prevMonth);
         model.addAttribute("nextMonth", nextMonth);
+
+        Map<LocalDate, WorkoutSession> sessions = workoutSessionService.getAllSessionsOfUserForMonth(username, currentMonth.getYear(), currentMonth.getMonthValue()).stream()
+                .collect(Collectors.toMap(WorkoutSession::getDate, session -> session));
+
+        model.addAttribute("sessions", sessions);
+
+        List<Workout> workouts = workoutService.getAllWorkouts();
+        model.addAttribute("workouts", workouts);
+
         model.addAttribute("workoutSession", new WorkoutSession());
         return "workouts";
     }
@@ -67,7 +64,22 @@ public class WorkoutSessionController {
         String username = UserAuthenticationUtils.getLoggedUsername();
         User user = userService.getUserByEmail(username);
         session.setUser(user);
+
+        WorkoutSession existingSession = workoutSessionService.getUserSessionByDate(username, session.getDate());
+        if (existingSession != null)
+            workoutSessionService.updateSession(existingSession.getId(), session);
+
         workoutSessionService.saveSession(session);
-        return "redirect:/sessions";
+        return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+    }
+
+    @DeleteMapping("/{date}")
+    public ResponseEntity<String> delete(@PathVariable String date) {
+        WorkoutSession session = workoutSessionService.getUserSessionByDate(UserAuthenticationUtils.getLoggedUsername(), LocalDate.parse(date));
+        if (session == null)
+            return ResponseEntity.notFound().build();
+
+        workoutSessionService.deleteSession(session.getId());
+        return ResponseEntity.ok().build();
     }
 }
