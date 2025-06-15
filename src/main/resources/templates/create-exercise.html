@@ -8,113 +8,115 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Create New Exercise</h1>
-        
-        <form th:action="@{/exercises}" method="post" th:object="${exercise}">
-            <div class="mb-3">
-                <label for="name" class="form-label">Exercise Name</label>
-                <input type="text" class="form-control" id="name" th:field="*{name}" required>
-                <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-            </div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" th:field="*{description}" rows="3" required></textarea>
-                <div class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
-            </div>
+<div class="container mt-5">
+    <h1 class="mb-4">Create New Exercise</h1>
 
-            <div class="mb-3">
-                <label for="equipment" class="form-label">Equipment</label>
-                <input type="text" class="form-control" id="equipment" th:field="*{equipment}" required>
-                <div class="text-danger" th:if="${#fields.hasErrors('equipment')}" th:errors="*{equipment}"></div>
-            </div>
+    <form th:action="@{/exercises}" method="post" th:object="${exercise}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Exercise Name</label>
+            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
 
-            <div class="mb-3">
-                <label for="difficulty" class="form-label">Difficulty Level</label>
-                <select class="form-select" id="difficulty" th:field="*{difficulty}" required>
-                    <option value="">Select difficulty</option>
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                </select>
-                <div class="text-danger" th:if="${#fields.hasErrors('difficulty')}" th:errors="*{difficulty}"></div>
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Muscle Groups</label>
-                <div class="card p-3 mb-3">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-check" th:each="muscleGroup : ${muscleGroups}">
-                                <input class="form-check-input" type="checkbox"
-                                       th:field="*{muscleGroups}"
-                                       th:value="${muscleGroup.id}">
-                                <label class="form-check-label" th:text="${muscleGroup.name}"></label>
-                            </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="3" required></textarea>
+            <div class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="equipment" class="form-label">Equipment</label>
+            <input type="text" class="form-control" id="equipment" th:field="*{equipment}" required>
+            <div class="text-danger" th:if="${#fields.hasErrors('equipment')}" th:errors="*{equipment}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Difficulty Level</label>
+            <select class="form-select" id="difficulty" th:field="*{difficulty}" required>
+                <option value="">Select difficulty</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('difficulty')}" th:errors="*{difficulty}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Muscle Groups</label>
+            <div class="card p-3 mb-3">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-check" th:each="muscleGroup : ${muscleGroups}">
+                            <input class="form-check-input" type="checkbox"
+                                   th:field="*{muscleGroups}"
+                                   th:value="${muscleGroup.id}">
+                            <label class="form-check-label" th:text="${muscleGroup.name}"></label>
                         </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <input type="text" id="newMuscleGroup" class="form-control"
-                                       placeholder="New muscle group">
-                                <button type="button" class="btn btn-secondary" onclick="addMuscleGroup()">Add</button>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" id="newMuscleGroup" class="form-control"
+                                   placeholder="New muscle group">
+                            <button type="button" class="btn btn-secondary" onclick="addMuscleGroup()">Add</button>
                         </div>
                     </div>
                 </div>
-                <div class="text-danger" th:if="${#fields.hasErrors('muscleGroups')}" th:errors="*{muscleGroups}"></div>
             </div>
+            <div class="text-danger" th:if="${#fields.hasErrors('muscleGroups')}" th:errors="*{muscleGroups}"></div>
+        </div>
 
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Create Exercise</button>
-                <a th:href="@{/exercises}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Create Exercise</button>
+            <a th:href="@{/exercises}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function addMuscleGroup() {
-            const newGroupInput = document.getElementById('newMuscleGroup');
-            const newGroupName = newGroupInput.value.trim();
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function addMuscleGroup() {
+        const newGroupInput = document.getElementById('newMuscleGroup');
+        const newGroupName = newGroupInput.value.trim();
 
-            if (newGroupName) {
-                const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-                const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+        if (newGroupName) {
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-                fetch('/api/muscleGroups', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [header]: token
-                    },
-                    body: JSON.stringify({name: newGroupName}),
+            fetch('/api/muscleGroups', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                },
+                body: JSON.stringify({name: newGroupName}),
+            })
+                .then(response => response.json())
+                .then(muscleGroup => {
+                    const checkboxContainer = document.querySelector('.form-check').parentElement;
+                    const newCheckboxDiv = document.createElement('div');
+                    newCheckboxDiv.className = 'form-check';
+
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.className = 'form-check-input';
+                    input.name = 'muscleGroups';
+                    input.value = muscleGroup.id;
+                    input.checked = true;
+
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label';
+                    label.textContent = muscleGroup.name;
+
+                    newCheckboxDiv.appendChild(input);
+                    newCheckboxDiv.appendChild(label);
+                    checkboxContainer.appendChild(newCheckboxDiv);
                 })
-                    .then(response => response.json())
-                    .then(muscleGroup => {
-                        const checkboxContainer = document.querySelector('.form-check').parentElement;
-                        const newCheckboxDiv = document.createElement('div');
-                        newCheckboxDiv.className = 'form-check';
-
-                        const input = document.createElement('input');
-                        input.type = 'checkbox';
-                        input.className = 'form-check-input';
-                        input.name = 'muscleGroups';
-                        input.value = muscleGroup.id;
-                        input.checked = true;
-
-                        const label = document.createElement('label');
-                        label.className = 'form-check-label';
-                        label.textContent = muscleGroup.name;
-
-                        newCheckboxDiv.appendChild(input);
-                        newCheckboxDiv.appendChild(label);
-                        checkboxContainer.appendChild(newCheckboxDiv);
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-            newGroupInput.value = '';
+                .catch(error => console.error('Error:', error));
         }
-    </script>
+        newGroupInput.value = '';
+    }
+</script>
 </body>
 </html>

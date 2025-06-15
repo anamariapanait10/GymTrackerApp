@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Workouts</title>
+    <title>Exercises</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
@@ -9,11 +9,9 @@
 <body class="bg-light">
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container my-5">
-
-    <!-- Page Header -->
     <header class="mb-4">
-        <h1 class="text-center">Workouts</h1>
-        <a class="btn btn-primary" th:href="@{/workouts/create}">Create New Workout</a>
+        <h1 class="text-center">Exercises</h1>
+        <a class="btn btn-primary" th:href="@{/exercises/create}">Create New Exercise</a>
     </header>
 
     <section>
@@ -23,24 +21,22 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Sets</th>
+                <th>Muscle Group</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="workout, iterStat : ${workouts}">
-                <td th:text="${iterStat.index + 1}"></td>
-                <td th:text="${workout.name}"></td>
-                <td th:text="${workout.description}"></td>
+            <tr th:each="exercise, iterStat : ${exercises.content}">
+                <td th:text="${pageNumber * pageSize + iterStat.index + 1}"></td>
+                <td th:text="${exercise.name}"></td>
+                <td th:text="${exercise.description}"></td>
                 <td>
                     <ul class="mb-0">
-                        <li th:each="set : ${workout.sets}" 
-                            th:text="'Exercise: ' + ${set.exercise.name} + ', Weight: ' + ${set.weight} + ' kg, Reps: ' + ${set.reps}">
-                        </li>
+                        <li th:each="muscle : ${exercise.muscleGroups}" th:text="${muscle}"></li>
                     </ul>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" th:attr="onclick='deleteWorkout(\'' + ${workout.id} + '\')'">
+                    <button type="button" class="btn btn-danger btn-sm" th:attr="onclick='deleteExercise(\'' + ${exercise.id} + '\')'">
                         Delete
                     </button>
                 </td>
@@ -48,11 +44,11 @@
             </tbody>
         </table>
 
-        <p class="text-muted" th:if="${workouts.isEmpty()}">No workouts found.</p>
+        <p class="text-muted" th:if="${exercises.content.isEmpty()}">No exercises found.</p>
     </section>
 
     <div class="d-flex justify-content-end mb-3">
-        <form th:action="@{/workouts}" method="get">
+        <form th:action="@{/exercises}" method="get">
             <label for="pageSize" class="me-2">Items per page:</label>
             <select name="size" id="pageSize" class="form-select" style="width: auto; display: inline-block;" onchange="this.form.submit()">
                 <option value="2" th:selected="${ pageSize == 2}">2</option>
@@ -62,32 +58,32 @@
         </form>
     </div>
 
-    <nav aria-label="Page navigation" th:if="${workouts.totalPages > 0}">
+    <nav aria-label="Page navigation" th:if="${exercises.totalPages > 0}">
         <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${workouts.hasPrevious() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/workouts(page=${workouts.number - 1}, size=${pageSize})}">Previous</a>
+            <li class="page-item" th:classappend="${exercises.hasPrevious() ? '' : 'disabled'}">
+                <a class="page-link" th:href="@{/exercises(page=${exercises.number - 1}, size=${pageSize})}">Previous</a>
             </li>
-            <li class="page-item" th:each="page : ${#numbers.sequence(1, workouts.totalPages)}"
-                th:classappend="${page == workouts.number + 1 ? 'active' : ''}">
-                <a class="page-link" th:href="@{/workouts(page=${page - 1}, size=${pageSize})}" th:text="${page}"></a>
+            <li class="page-item" th:each="page : ${#numbers.sequence(1, exercises.totalPages)}"
+                th:classappend="${page == exercises.number + 1 ? 'active' : ''}">
+                <a class="page-link" th:href="@{/exercises(page=${page - 1}, size=${pageSize})}" th:text="${page}"></a>
             </li>
-            <li class="page-item" th:classappend="${workouts.hasNext() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/workouts(page=${workouts.number + 1}, size=${pageSize})}">Next</a>
+            <li class="page-item" th:classappend="${exercises.hasNext() ? '' : 'disabled'}">
+                <a class="page-link" th:href="@{/exercises(page=${exercises.number + 1}, size=${pageSize})}">Next</a>
             </li>
         </ul>
     </nav>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    function deleteWorkout(id) {
+    function deleteExercise(id) {
         const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch('/workouts/' + id + '/delete', {
+        fetch('/exercises/' + id + '/delete', {
             method: 'DELETE',
             headers: {
+                'Content-Type': 'application/json',
                 [header]: token
             }
         }).then(response => {
@@ -95,12 +91,13 @@
                 window.location.reload();
             } else {
                 return response.text().then(text => {
-                    alert('Failed to delete workout.\n' + text);
+                    alert('Failed to delete exercise.\n' + text);
                 });
             }
         })
     }
 
 </script>
+
 </body>
 </html>

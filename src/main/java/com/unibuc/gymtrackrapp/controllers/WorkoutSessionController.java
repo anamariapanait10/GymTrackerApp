@@ -56,7 +56,7 @@ public class WorkoutSessionController {
         model.addAttribute("workouts", workouts);
 
         model.addAttribute("workoutSession", new WorkoutSession());
-        return "workouts";
+        return "sessions";
     }
 
     @PostMapping

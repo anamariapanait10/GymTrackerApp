@@ -6,6 +6,8 @@
     <title>Create workout</title>
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
 <div class="container mt-5">
     <h2>Create New Workout</h2>
 
@@ -17,7 +19,8 @@
 
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea th:field="*{description}" id="description" class="form-control" rows="4" placeholder="Describe the workout..."></textarea>
+            <textarea th:field="*{description}" id="description" class="form-control" rows="4"
+                      placeholder="Describe the workout..."></textarea>
         </div>
 
         <div class="mb-3">

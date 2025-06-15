@@ -22,10 +22,6 @@ public class WorkoutSet {
     private Exercise exercise;
 
     @ManyToOne
-    @JoinColumn(name = "session_id")
-    private WorkoutSession workoutSession;
-
-    @ManyToOne
     @JoinColumn(name = "workout_id")
     private Workout workout;
 }
