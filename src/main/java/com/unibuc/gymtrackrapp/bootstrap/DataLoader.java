@@ -16,10 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 @AllArgsConstructor
 @Component

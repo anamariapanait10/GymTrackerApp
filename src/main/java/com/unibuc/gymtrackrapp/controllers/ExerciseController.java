@@ -2,29 +2,24 @@ package com.unibuc.gymtrackrapp.controllers;
 
 import com.unibuc.gymtrackrapp.config.Log;
 import com.unibuc.gymtrackrapp.domain.Exercise;
-import com.unibuc.gymtrackrapp.domain.Workout;
 import com.unibuc.gymtrackrapp.dtos.ExerciseDTO;
 import com.unibuc.gymtrackrapp.exceptions.ResourceNotFoundException;
-import com.unibuc.gymtrackrapp.repositories.MuscleGroupRepository;
 import com.unibuc.gymtrackrapp.services.ExerciseService;
 import com.unibuc.gymtrackrapp.services.MuscleGroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -53,14 +48,18 @@ public class ExerciseController {
     }
 
     @GetMapping
-    public String listExercises(Pageable pageable, Model model) {
+    public String listExercises(@RequestParam(defaultValue = "asc") String sortDir, Pageable pageable, Model model) {
         if (pageable.getPageSize() > 10 || pageable.getPageNumber() < 0)
             pageable = Pageable.ofSize(10).withPage(0);
+
+        Sort sort = Sort.by(sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "name");
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
         Page<ExerciseDTO> exercises = exerciseService.findAll(pageable);
         model.addAttribute("exercises", exercises);
         model.addAttribute("pageSize", pageable.getPageSize());
         model.addAttribute("pageNumber", pageable.getPageNumber());
+        model.addAttribute("sortDir", sortDir);
 
         return "exercises";
     }

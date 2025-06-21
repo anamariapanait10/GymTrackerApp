@@ -19,7 +19,13 @@
             <thead class="table-dark">
             <tr>
                 <th>#</th>
-                <th>Name</th>
+                <th>
+                    Name
+                    <a th:href="@{/exercises(page=${pageNumber}, size=${pageSize}, sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
+                       class="btn btn-sm btn-outline-light ms-2">
+                        <span th:text="${sortDir == 'asc' ? '↓' : '↑'}"></span>
+                    </a>
+                </th>
                 <th>Description</th>
                 <th>Muscle Group</th>
                 <th>Actions</th>
@@ -61,14 +67,23 @@
     <nav aria-label="Page navigation" th:if="${exercises.totalPages > 0}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${exercises.hasPrevious() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/exercises(page=${exercises.number - 1}, size=${pageSize})}">Previous</a>
+                <a class="page-link"
+                   th:href="@{/exercises(page=${exercises.number - 1}, size=${pageSize}, sortDir=${sortDir})}">
+                    Previous
+                </a>
             </li>
             <li class="page-item" th:each="page : ${#numbers.sequence(1, exercises.totalPages)}"
                 th:classappend="${page == exercises.number + 1 ? 'active' : ''}">
-                <a class="page-link" th:href="@{/exercises(page=${page - 1}, size=${pageSize})}" th:text="${page}"></a>
+                <a class="page-link"
+                   th:href="@{/exercises(page=${page - 1}, size=${pageSize}, sortDir=${sortDir})}"
+                   th:text="${page}">
+                </a>
             </li>
             <li class="page-item" th:classappend="${exercises.hasNext() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/exercises(page=${exercises.number + 1}, size=${pageSize})}">Next</a>
+                <a class="page-link"
+                   th:href="@{/exercises(page=${exercises.number + 1}, size=${pageSize}, sortDir=${sortDir})}">
+                    Next
+                </a>
             </li>
         </ul>
     </nav>

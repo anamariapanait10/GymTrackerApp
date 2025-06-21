@@ -95,5 +95,4 @@ public class WorkoutController {
             return ResponseEntity.badRequest().body("An unexpected error occurred while trying to delete the exercise.");
         }
     }
-
 }

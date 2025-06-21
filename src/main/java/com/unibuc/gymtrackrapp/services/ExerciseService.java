@@ -63,6 +63,4 @@ public class ExerciseService {
         exercise.getMuscleGroups().clear();
         exerciseRepository.deleteById(id);
     }
-
-
 }
