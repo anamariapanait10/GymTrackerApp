@@ -20,9 +20,9 @@ public class MuscleGroupController {
     private final MuscleGroupService muscleGroupService;
 
     @PostMapping
-    public ResponseEntity<MuscleGroup> addMuscleGroup(@Valid @RequestBody MuscleGroupDTO dto, BindingResult bindingResult) {
+    public ResponseEntity<Object> addMuscleGroup(@Valid @RequestBody MuscleGroupDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
         return ResponseEntity.ok(muscleGroupService.createMuscleGroup(dto.getName()));
