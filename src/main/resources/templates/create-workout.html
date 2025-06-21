@@ -20,7 +20,7 @@
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <textarea th:field="*{description}" id="description" class="form-control" rows="4"
-                      placeholder="Describe the workout..."></textarea>
+                      placeholder="Describe the workout..." required></textarea>
         </div>
 
         <div class="mb-3">
@@ -52,6 +52,7 @@
                     </div>
                 </div>
             </div>
+            <div class="text-danger" th:if="${#fields.hasErrors('sets')}" th:errors="*{sets}"></div>
             <button type="button" class="btn btn-secondary" onclick="addSet()">Add Set</button>
         </div>
 

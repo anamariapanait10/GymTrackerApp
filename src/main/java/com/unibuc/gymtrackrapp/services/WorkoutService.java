@@ -6,6 +6,7 @@ import com.unibuc.gymtrackrapp.dtos.ExerciseDTO;
 import com.unibuc.gymtrackrapp.dtos.WorkoutCreateDTO;
 import com.unibuc.gymtrackrapp.dtos.WorkoutDTO;
 import com.unibuc.gymtrackrapp.dtos.WorkoutSetDTO;
+import com.unibuc.gymtrackrapp.exceptions.ResourceNotFoundException;
 import com.unibuc.gymtrackrapp.repositories.WorkoutRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,17 +33,14 @@ public class WorkoutService {
         return workoutRepository.findAll(pageable);
     }
 
-//    public Page<WorkoutCreateDTO> findAll(Pageable pageable) {
-//        return workoutRepository.findAll(pageable).map(workout -> new WorkoutCreateDTO(workout.getId(), workout.getName(), workout.getDescription(),
-//                workout.getSets().stream()
-//                        .map(workoutSet -> new WorkoutSetDTO(workoutSet.getExercise().getId(), workoutSet.getWeight(), workoutSet.getReps())).collect(Collectors.toList())));
-//    }
-
     public Workout saveWorkout(Workout workout) {
         return workoutRepository.save(workout);
     }
 
     public void deleteWorkout(UUID id) {
+        if (!workoutRepository.existsById(id))
+            throw new ResourceNotFoundException("Workout not found");
+
         workoutRepository.deleteById(id);
     }
 }

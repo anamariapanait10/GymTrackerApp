@@ -4,20 +4,27 @@ import com.unibuc.gymtrackrapp.config.Log;
 import com.unibuc.gymtrackrapp.domain.Exercise;
 import com.unibuc.gymtrackrapp.domain.Workout;
 import com.unibuc.gymtrackrapp.dtos.ExerciseDTO;
+import com.unibuc.gymtrackrapp.exceptions.ResourceNotFoundException;
 import com.unibuc.gymtrackrapp.repositories.MuscleGroupRepository;
 import com.unibuc.gymtrackrapp.services.ExerciseService;
 import com.unibuc.gymtrackrapp.services.MuscleGroupService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,7 +43,11 @@ public class ExerciseController {
     }
 
     @PostMapping
-    public String saveExercise(@ModelAttribute Exercise exercise) {
+    public String saveExercise(@Valid @ModelAttribute Exercise exercise, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("muscleGroups", muscleGroupService.getAllMuscleGroups());
+            return "create-exercise";
+        }
         exerciseService.saveExercise(exercise);
         return "redirect:/exercises";
     }
@@ -59,6 +70,8 @@ public class ExerciseController {
         try {
             exerciseService.deleteExerciseById(id);
             return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException ex) {
+          throw ex;
         } catch (DataIntegrityViolationException ex) {
             return ResponseEntity.badRequest().body("Cannot delete exercise as it is associated with other records.");
         } catch (Exception ex) {

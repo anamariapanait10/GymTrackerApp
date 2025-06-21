@@ -92,7 +92,13 @@
                 },
                 body: JSON.stringify({name: newGroupName}),
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status !== 200) {
+                        alert('Failed to add muscle group! ' + response.statusText);
+                        return null;
+                    }
+                    return response.json();
+                })
                 .then(muscleGroup => {
                     const checkboxContainer = document.querySelector('.form-check').parentElement;
                     const newCheckboxDiv = document.createElement('div');

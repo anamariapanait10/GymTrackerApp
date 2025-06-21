@@ -4,6 +4,7 @@ import com.unibuc.gymtrackrapp.domain.Exercise;
 import com.unibuc.gymtrackrapp.domain.MuscleGroup;
 import com.unibuc.gymtrackrapp.domain.WorkoutSet;
 import com.unibuc.gymtrackrapp.dtos.ExerciseDTO;
+import com.unibuc.gymtrackrapp.exceptions.ResourceNotFoundException;
 import com.unibuc.gymtrackrapp.repositories.ExerciseRepository;
 import com.unibuc.gymtrackrapp.repositories.WorkoutRepository;
 import com.unibuc.gymtrackrapp.repositories.WorkoutSetRepository;
@@ -48,7 +49,7 @@ public class ExerciseService {
 
     public void deleteExerciseById(UUID id) {
         Exercise exercise = exerciseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exercise not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
 
         Set<WorkoutSet> allByExercise = workoutSetRepository.findAllByExercise(exercise);
         for (WorkoutSet ws : allByExercise) {

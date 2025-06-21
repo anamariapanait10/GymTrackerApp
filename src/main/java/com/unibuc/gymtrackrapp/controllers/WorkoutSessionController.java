@@ -4,6 +4,7 @@ import com.unibuc.gymtrackrapp.config.Log;
 import com.unibuc.gymtrackrapp.domain.Workout;
 import com.unibuc.gymtrackrapp.domain.WorkoutSession;
 import com.unibuc.gymtrackrapp.domain.security.User;
+import com.unibuc.gymtrackrapp.exceptions.ResourceNotFoundException;
 import com.unibuc.gymtrackrapp.services.UserService;
 import com.unibuc.gymtrackrapp.services.WorkoutService;
 import com.unibuc.gymtrackrapp.services.WorkoutSessionService;
@@ -66,8 +67,10 @@ public class WorkoutSessionController {
         session.setUser(user);
 
         WorkoutSession existingSession = workoutSessionService.getUserSessionByDate(username, session.getDate());
-        if (existingSession != null)
+        if (existingSession != null) {
             workoutSessionService.updateSession(existingSession.getId(), session);
+            return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+        }
 
         workoutSessionService.saveSession(session);
         return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
@@ -77,7 +80,7 @@ public class WorkoutSessionController {
     public ResponseEntity<String> delete(@PathVariable String date) {
         WorkoutSession session = workoutSessionService.getUserSessionByDate(UserAuthenticationUtils.getLoggedUsername(), LocalDate.parse(date));
         if (session == null)
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Workout session not found for date: " + date);
 
         workoutSessionService.deleteSession(session.getId());
         return ResponseEntity.ok().build();

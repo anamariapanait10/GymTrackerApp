@@ -5,8 +5,10 @@ import com.unibuc.gymtrackrapp.domain.Workout;
 import com.unibuc.gymtrackrapp.domain.WorkoutSet;
 import com.unibuc.gymtrackrapp.dtos.WorkoutCreateDTO;
 import com.unibuc.gymtrackrapp.dtos.WorkoutDTO;
+import com.unibuc.gymtrackrapp.exceptions.ResourceNotFoundException;
 import com.unibuc.gymtrackrapp.services.ExerciseService;
 import com.unibuc.gymtrackrapp.services.WorkoutService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,7 +41,12 @@ public class WorkoutController {
     }
 
     @PostMapping
-    public String saveWorkout(@ModelAttribute WorkoutCreateDTO workoutDTO) {
+    public String saveWorkout(@Valid @ModelAttribute WorkoutCreateDTO workoutDTO, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("exercises", exerciseService.getAllExercises());
+            return "create-workout";
+        }
+
         Workout workout = new Workout();
         workout.setName(workoutDTO.getName());
         workout.setDescription(workoutDTO.getDescription());
@@ -78,7 +86,10 @@ public class WorkoutController {
         try {
             workoutService.deleteWorkout(id);
             return ResponseEntity.ok().build();
-        } catch (DataIntegrityViolationException ex) {
+        } catch (ResourceNotFoundException ex) {
+            throw ex;
+        }
+        catch (DataIntegrityViolationException ex) {
             return ResponseEntity.badRequest().body("Cannot delete exercise as it is associated with other records.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body("An unexpected error occurred while trying to delete the exercise.");
