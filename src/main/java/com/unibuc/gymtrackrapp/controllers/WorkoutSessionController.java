@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.result.view.Rendering;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -32,8 +34,8 @@ public class WorkoutSessionController {
 
     @Log
     @GetMapping
-    public String showWorkoutsForm(@RequestParam(value = "year", required = false) Integer year,
-                                   @RequestParam(value = "month", required = false) Integer month, Model model) {
+    public Mono<Rendering> showWorkoutsForm(@RequestParam(value = "year", required = false) Integer year,
+                                            @RequestParam(value = "month", required = false) Integer month, Model model) {
 
         String username = UserAuthenticationUtils.getLoggedUsername();
 
@@ -43,24 +45,27 @@ public class WorkoutSessionController {
 
         YearMonth prevMonth = currentMonth.minusMonths(1);
         YearMonth nextMonth = currentMonth.plusMonths(1);
-        model.addAttribute("currentMonth", currentMonth);
-        model.addAttribute("prevMonth", prevMonth);
-        model.addAttribute("nextMonth", nextMonth);
 
-        Map<LocalDate, WorkoutSession> sessions = workoutSessionService.getAllSessionsOfUserForMonth(username, currentMonth.getYear(), currentMonth.getMonthValue()).stream()
-                .collect(Collectors.toMap(WorkoutSession::getDate, session -> session));
+        Mono<Map<LocalDate, WorkoutSession>> sessions =
+                workoutSessionService.getAllSessionsOfUserForMonth(username, currentMonth.getYear(), currentMonth.getMonthValue())
+                        .collectMap(WorkoutSession::getDate, session -> session);
 
-        model.addAttribute("sessions", sessions);
-
-        List<Workout> workouts = workoutService.getAllWorkouts();
-        model.addAttribute("workouts", workouts);
-
-        model.addAttribute("workoutSession", new WorkoutSession());
-        return "sessions";
+        return sessions.flatMap(s ->
+                workoutService.getAllWorkouts().collectList().map(workouts ->
+                        Rendering.view("sessions")
+                                .modelAttribute("currentMonth", currentMonth)
+                                    .modelAttribute("prevMonth", prevMonth)
+                                .modelAttribute("nextMonth", nextMonth)
+                                .modelAttribute("sessions", s)
+                                .modelAttribute("workouts", workouts)
+                                .modelAttribute("workoutSession", new WorkoutSession())
+                                .build()
+                )
+        );
     }
 
     @PostMapping
-    public String saveWorkoutSession(@ModelAttribute WorkoutSession session) {
+    public Mono<String> saveWorkoutSession(@ModelAttribute WorkoutSession session) {
         String username = UserAuthenticationUtils.getLoggedUsername();
         User user = userService.getUserByEmail(username);
         session.setUser(user);

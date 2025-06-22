@@ -18,6 +18,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.result.view.Rendering;
+import org.thymeleaf.spring6.context.webflux.IReactiveDataDriverContextVariable;
+import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -31,16 +35,21 @@ public class ExerciseController {
 
     @Log
     @GetMapping( "/create")
-    public String showExercisesForm(Model model) {
-        model.addAttribute("exercise", new Exercise());
-        model.addAttribute("muscleGroups", muscleGroupService.getAllMuscleGroups());
-        return "create-exercise";
+    public Mono<Rendering> showExercisesForm(Model model) {
+        IReactiveDataDriverContextVariable reactiveDataDrivenMode =
+                new ReactiveDataDriverContextVariable(muscleGroupService.getAllMuscleGroups(), 10);
+
+        return Mono.just(Rendering.view("create-exercise")
+                .modelAttribute("exercise", new Exercise())
+                .modelAttribute("muscleGroups", reactiveDataDrivenMode).build());
     }
 
     @PostMapping
     public String saveExercise(@Valid @ModelAttribute Exercise exercise, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("muscleGroups", muscleGroupService.getAllMuscleGroups());
+            IReactiveDataDriverContextVariable reactiveDataDrivenMode =
+                    new ReactiveDataDriverContextVariable(muscleGroupService.getAllMuscleGroups(), 10);
+            model.addAttribute("muscleGroups", reactiveDataDrivenMode);
             return "create-exercise";
         }
         exerciseService.saveExercise(exercise);
@@ -76,7 +85,5 @@ public class ExerciseController {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body("An unexpected error occurred while trying to delete the exercise.");
         }
-
     }
-
 }

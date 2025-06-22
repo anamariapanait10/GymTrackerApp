@@ -2,12 +2,12 @@ package com.unibuc.gymtrackrapp.repositories;
 
 import com.unibuc.gymtrackrapp.domain.Exercise;
 import com.unibuc.gymtrackrapp.domain.WorkoutSet;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 
-import java.util.Set;
 import java.util.UUID;
 
-public interface WorkoutSetRepository extends JpaRepository<WorkoutSet, UUID> {
+public interface WorkoutSetRepository extends ReactiveMongoRepository<WorkoutSet, UUID> {
 
-    Set<WorkoutSet> findAllByExercise(Exercise exercise);
+    Flux<WorkoutSet> findAllByExercise(Exercise exercise);
 }

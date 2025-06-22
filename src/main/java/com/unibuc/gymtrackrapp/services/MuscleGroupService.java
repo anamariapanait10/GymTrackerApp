@@ -4,9 +4,9 @@ import com.unibuc.gymtrackrapp.domain.MuscleGroup;
 import com.unibuc.gymtrackrapp.repositories.MuscleGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -14,29 +14,29 @@ import java.util.UUID;
 public class MuscleGroupService {
     private final MuscleGroupRepository muscleGroupRepository;
 
-    public List<MuscleGroup> getAllMuscleGroups() {
+    public Flux<MuscleGroup> getAllMuscleGroups() {
         return muscleGroupRepository.findAll();
     }
 
-    public Optional<MuscleGroup> getMuscleGroupById(UUID id) {
+    public Mono<MuscleGroup> getMuscleGroupById(UUID id) {
         return muscleGroupRepository.findById(id);
     }
 
-    public MuscleGroup createMuscleGroup(String name) {
+    public Mono<MuscleGroup> createMuscleGroup(String name) {
         MuscleGroup muscleGroup = new MuscleGroup();
         muscleGroup.setName(name);
         return muscleGroupRepository.save(muscleGroup);
     }
 
-    public MuscleGroup saveMuscleGroup(MuscleGroup muscleGroup) {
+    public Mono<MuscleGroup> saveMuscleGroup(MuscleGroup muscleGroup) {
         return muscleGroupRepository.save(muscleGroup);
     }
 
-    public void deleteMuscleGroup(UUID id) {
+    public Mono<Void> deleteMuscleGroup(UUID id) {
         muscleGroupRepository.deleteById(id);
     }
 
-    public boolean existsById(UUID id) {
+    public Mono<Boolean> existsById(UUID id) {
         return muscleGroupRepository.existsById(id);
     }
 

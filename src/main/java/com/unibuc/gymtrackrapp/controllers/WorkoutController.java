@@ -18,6 +18,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.result.view.Rendering;
+import org.thymeleaf.spring6.context.webflux.IReactiveDataDriverContextVariable;
+import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,11 +37,13 @@ public class WorkoutController {
 
     @Log
     @GetMapping( "/create")
-    public String showWorkoutForm(Model model) {
-        model.addAttribute("workoutCreateDTO", new WorkoutCreateDTO());
-        model.addAttribute("exercises", exerciseService.getAllExercises());
+    public Mono<Rendering> showWorkoutForm(Model model) {
+        IReactiveDataDriverContextVariable reactiveDataDrivenMode =
+                new ReactiveDataDriverContextVariable(exerciseService.getAllExercises(), 10);
 
-        return "create-workout";
+        return Mono.just(Rendering.view("create-workout")
+                .modelAttribute("workoutCreateDTO", new WorkoutCreateDTO())
+                .modelAttribute("exercises", reactiveDataDrivenMode).build());
     }
 
     @PostMapping
@@ -68,31 +74,28 @@ public class WorkoutController {
     }
 
     @GetMapping
-    public String listWorkouts(Pageable pageable, Model model) {
+    public Mono<Rendering> listWorkouts(Pageable pageable) {
         if (pageable.getPageSize() > 10 || pageable.getPageNumber() < 0)
             pageable = Pageable.ofSize(10).withPage(0);
 
-        Page<Workout> workouts = workoutService.findAll(pageable);
+        Mono<Page<Workout>> workouts = workoutService.findAll(pageable);
 
-        model.addAttribute("workouts", workouts);
-        model.addAttribute("pageSize", pageable.getPageSize());
-        model.addAttribute("pageNumber", pageable.getPageNumber());
-
-        return "workouts";
+        return Mono.just(Rendering.view("workouts")
+                .modelAttribute("workouts", workouts)
+                .modelAttribute("pageSize", pageable.getPageSize())
+                .modelAttribute("pageNumber", pageable.getPageNumber()).build());
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteWorkout(@PathVariable UUID id) {
-        try {
-            workoutService.deleteWorkout(id);
-            return ResponseEntity.ok().build();
-        } catch (ResourceNotFoundException ex) {
-            throw ex;
-        }
-        catch (DataIntegrityViolationException ex) {
-            return ResponseEntity.badRequest().body("Cannot delete exercise as it is associated with other records.");
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body("An unexpected error occurred while trying to delete the exercise.");
-        }
+    public Mono<ResponseEntity<String>> deleteWorkout(@PathVariable UUID id) {
+        return workoutService.deleteWorkout(id)
+                .thenReturn(ResponseEntity.ok().<String>build())
+                .onErrorResume(ResourceNotFoundException.class, ex -> Mono.error(ex))
+                .onErrorResume(DataIntegrityViolationException.class,
+                        ex -> Mono.just(ResponseEntity.badRequest()
+                                .body("Cannot delete exercise as it is associated with other records.")))
+                .onErrorResume(Exception.class,
+                        ex -> Mono.just(ResponseEntity.badRequest()
+                                .body("An unexpected error occurred while trying to delete the exercise.")));
     }
 }

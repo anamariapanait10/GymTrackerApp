@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,23 +17,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WorkoutService {
     private final WorkoutRepository workoutRepository;
-    public List<Workout> getAllWorkouts() {
+
+    public Flux<Workout> getAllWorkouts() {
         return workoutRepository.findAll();
     }
 
-    public Workout getWorkout(UUID id) {
+    public Mono<Workout> getWorkout(UUID id) {
         return workoutRepository.findById(id).orElse(null);
     }
 
-    public Page<Workout> findAll(Pageable pageable) {
+    public Mono<Page<Workout>> findAll(Pageable pageable) {
         return workoutRepository.findAll(pageable);
     }
 
-    public Workout saveWorkout(Workout workout) {
+    public Mono<Workout> saveWorkout(Workout workout) {
         return workoutRepository.save(workout);
     }
 
-    public void deleteWorkout(UUID id) {
+    public Mono<Void> deleteWorkout(UUID id) {
         if (!workoutRepository.existsById(id))
             throw new ResourceNotFoundException("Workout not found");
 

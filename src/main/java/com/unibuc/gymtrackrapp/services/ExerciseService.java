@@ -12,8 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,18 +26,19 @@ public class ExerciseService {
     private final WorkoutSetRepository workoutSetRepository;
     private final WorkoutRepository workoutRepository;
 
-    public List<Exercise> getAllExercises() {
+    public Flux<Exercise> getAllExercises() {
         return exerciseRepository.findAll();
     }
 
-    public Exercise saveExercise(Exercise exercise) {
+    public Mono<Exercise> saveExercise(Exercise exercise) {
         return exerciseRepository.save(exercise);
     }
 
-    public Exercise getExercise(UUID exerciseId) {
+    public Mono<Exercise> getExercise(UUID exerciseId) {
         return exerciseRepository.findById(exerciseId).orElse(null);
     }
-    public Page<ExerciseDTO> findAll(Pageable pageable) {
+
+    public Mono<Page<ExerciseDTO>> findAll(Pageable pageable) {
         return exerciseRepository.findAll(pageable)
                 .map(exercise -> new ExerciseDTO(exercise.getId(), exercise.getName(),
                         exercise.getDescription(),
@@ -47,7 +49,7 @@ public class ExerciseService {
                                 .collect(Collectors.toSet())));
     }
 
-    public void deleteExerciseById(UUID id) {
+    public Mono<Void> deleteExerciseById(UUID id) {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
 
