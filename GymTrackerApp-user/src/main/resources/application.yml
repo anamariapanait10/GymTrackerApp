@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: GymTrackerApp-user
+  config:
+    import: optional:configserver:http://localhost:8070/
+  profiles:
+    active: prod
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/gymtrackerapp/protocol/openid-connect/certs
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+
+gymtrackerapp:
+  gateway:
+    base-url: http://localhost:8071/gymtrackerapp

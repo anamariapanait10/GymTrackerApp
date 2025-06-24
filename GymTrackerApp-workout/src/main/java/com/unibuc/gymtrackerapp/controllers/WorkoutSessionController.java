@@ -1,0 +1,85 @@
+package com.unibuc.gymtrackerapp.controllers;
+
+import com.unibuc.gymtrackerapp.domain.entity.Workout;
+import com.unibuc.gymtrackerapp.domain.entity.WorkoutSession;
+import com.unibuc.gymtrackerapp.domain.entity.security.User;
+import com.unibuc.gymtrackerapp.exceptions.ResourceNotFoundException;
+import com.unibuc.gymtrackerapp.services.UserServiceProxy;
+import com.unibuc.gymtrackerapp.services.WorkoutService;
+import com.unibuc.gymtrackerapp.services.WorkoutSessionService;
+import com.unibuc.gymtrackerapp.utils.UserAuthenticationUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/sessions")
+public class WorkoutSessionController {
+
+    private final WorkoutSessionService workoutSessionService;
+    private final WorkoutService workoutService;
+    private final UserServiceProxy userServiceProxy;
+
+    @GetMapping
+    public String showWorkoutsForm(@RequestParam(value = "year", required = false) Integer year,
+                                   @RequestParam(value = "month", required = false) Integer month, Model model) {
+
+        String username = UserAuthenticationUtils.getLoggedUsername();
+
+        YearMonth currentMonth = (year != null && month != null)
+                ? YearMonth.of(year, month)
+                : YearMonth.now();
+
+        YearMonth prevMonth = currentMonth.minusMonths(1);
+        YearMonth nextMonth = currentMonth.plusMonths(1);
+        model.addAttribute("currentMonth", currentMonth);
+        model.addAttribute("prevMonth", prevMonth);
+        model.addAttribute("nextMonth", nextMonth);
+
+        Map<LocalDate, WorkoutSession> sessions = workoutSessionService.getAllSessionsOfUserForMonth(username, currentMonth.getYear(), currentMonth.getMonthValue()).stream()
+                .collect(Collectors.toMap(WorkoutSession::getDate, session -> session));
+
+        model.addAttribute("sessions", sessions);
+
+        List<Workout> workouts = workoutService.getAllWorkouts();
+        model.addAttribute("workouts", workouts);
+
+        model.addAttribute("workoutSession", new WorkoutSession());
+        return "sessions";
+    }
+
+    @PostMapping
+    public String saveWorkoutSession(@ModelAttribute WorkoutSession session) {
+        String username = UserAuthenticationUtils.getLoggedUsername();
+        User user = userServiceProxy.getUserByEmail(username).block();
+        session.setUser(user);
+
+        WorkoutSession existingSession = workoutSessionService.getUserSessionByDate(username, session.getDate());
+        if (existingSession != null) {
+            workoutSessionService.updateSession(existingSession.getId(), session);
+            return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+        }
+
+        workoutSessionService.saveSession(session);
+        return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+    }
+
+    @DeleteMapping("/{date}")
+    public ResponseEntity<String> delete(@PathVariable String date) {
+        WorkoutSession session = workoutSessionService.getUserSessionByDate(UserAuthenticationUtils.getLoggedUsername(), LocalDate.parse(date));
+        if (session == null)
+            throw new ResourceNotFoundException("Workout session not found for date: " + date);
+
+        workoutSessionService.deleteSession(session.getId());
+        return ResponseEntity.ok().build();
+    }
+}
