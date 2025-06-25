@@ -15,6 +15,7 @@ public class AuthenticatedUserRegistrar {
 
     @ModelAttribute
     public void registerUserIfNeeded(Authentication authentication) {
+        authentication.getAuthorities().forEach(auth -> System.out.println(auth.getAuthority()));
         authService.registerUser(((JwtAuthenticationToken)authentication).getTokenAttributes().get("preferred_username").toString());
     }
 }

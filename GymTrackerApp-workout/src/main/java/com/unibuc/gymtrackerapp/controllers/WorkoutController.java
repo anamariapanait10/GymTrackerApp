@@ -8,6 +8,7 @@ import com.unibuc.gymtrackerapp.services.ExerciseService;
 import com.unibuc.gymtrackerapp.services.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/workouts")
 public class WorkoutController {
+
+    @Value("${gymtrackerapp.gateway.base-url}")
+    private String gatewayBaseUrl;
 
     private final WorkoutService workoutService;
     private final ExerciseService exerciseService;
@@ -61,7 +65,7 @@ public class WorkoutController {
         
         workout.setSets(sets);
         workoutService.saveWorkout(workout);
-        return "redirect:/workouts";
+        return "redirect:" + gatewayBaseUrl + "/workout/workouts";
     }
 
     @GetMapping

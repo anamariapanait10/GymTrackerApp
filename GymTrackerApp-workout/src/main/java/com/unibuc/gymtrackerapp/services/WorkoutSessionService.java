@@ -32,8 +32,10 @@ public class WorkoutSessionService {
         return sessionRepository.findById(id).orElse(null);
     }
 
-    public WorkoutSession saveSession(WorkoutSession session) {
-        return sessionRepository.save(session);
+    public WorkoutSession saveSession(WorkoutSession session, UUID userId) {
+        WorkoutSession savedSession = sessionRepository.save(session);
+        sessionRepository.updateUserId(savedSession.getId(), userId);
+        return savedSession;
     }
 
     public void deleteSession(UUID id) {
@@ -44,11 +46,13 @@ public class WorkoutSessionService {
         return sessionRepository.findByUserUsernameAndDate(email, date);
     }
 
-    public WorkoutSession updateSession(UUID id, WorkoutSession updatedSession) {
+    public WorkoutSession updateSession(UUID id, WorkoutSession updatedSession, UUID userId) {
         WorkoutSession existingSession = sessionRepository.findById(id).orElse(null);
         if (existingSession != null) {
             updatedSession.setId(id);
-            return sessionRepository.save(updatedSession);
+            WorkoutSession savedSession = sessionRepository.save(updatedSession);
+            sessionRepository.updateUserId(savedSession.getId(), userId);
+            return savedSession;
         }
         return null;
     }

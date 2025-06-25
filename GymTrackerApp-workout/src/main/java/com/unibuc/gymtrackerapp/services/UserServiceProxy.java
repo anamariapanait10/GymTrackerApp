@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class UserServiceProxy {
     private final WebClient webClient;
@@ -16,12 +18,12 @@ public class UserServiceProxy {
         this.webClient = builder.filter(new ServletBearerExchangeFilterFunction()).build(); // uses load-balanced builder
     }
 
-    public Mono<User> getUserByEmail(String username) {
+    public Mono<UUID> getUserByEmail(String username) {
         return webClient
                 .get()
-                .uri("lb://GYMTRACKERUSER/users/" + username) // Eureka service name
+                .uri("lb://GYMTRACKERAPP-USER/users/" + username) // Eureka service name
                 .header(HttpHeaders.AUTHORIZATION)
                 .retrieve()
-                .bodyToMono(User.class);
+                .bodyToMono(UUID.class);
     }
 }

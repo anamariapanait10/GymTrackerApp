@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -18,8 +20,8 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{email}")
-    public Mono<User> getUserByEmail(@PathVariable String email) {
-        return Mono.just(userService.getUserByEmail(email));
+    public Mono<UUID> getUserByEmail(@PathVariable String email) {
+        return Mono.just(userService.getUserByEmail(email).getId());
     }
 
 }

@@ -36,10 +36,10 @@
 <div class="container mt-4">
     <!-- Header with Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a th:href="@{/sessions(year=${prevMonth.year}, month=${prevMonth.monthValue})}"
+        <a th:href="@{/gymtrackerapp/workout/sessions(year=${prevMonth.year}, month=${prevMonth.monthValue})}"
            class="btn btn-outline-primary">← Prev</a>
         <h2 th:text="${currentMonth.month.name()} + ' ' + ${currentMonth.year}"></h2>
-        <a th:href="@{/sessions(year=${nextMonth.year}, month=${nextMonth.monthValue})}"
+        <a th:href="@{/gymtrackerapp/workout/sessions(year=${nextMonth.year}, month=${nextMonth.monthValue})}"
            class="btn btn-outline-primary">Next →</a>
     </div>
 
@@ -93,7 +93,7 @@
                 <h1 class="modal-title fs-5" id="createModalLabel">Create workout session</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form th:action="@{/sessions}" th:object="${workoutSession}" method="post">
+            <form th:action="@{http://localhost:8071/gymtrackerapp/workout/sessions}" th:object="${workoutSession}" method="post">
                 <div class="modal-body">
                     <input type="hidden" id="selectedDate" name="date">
                     <div class="mb-3">
@@ -127,7 +127,7 @@
                 <h1 class="modal-title fs-5" id="editModalLabel">Edit workout session</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form th:action="@{/sessions}" th:object="${workoutSession}" method="post">
+            <form th:action="@{http://localhost:8071/gymtrackerapp/workout/sessions}" th:object="${workoutSession}" method="post">
                 <div class="modal-body">
                     <input type="hidden" id="editSelectedDate" name="date">
                     <div class="mb-3">
@@ -164,7 +164,7 @@
         const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         let date = document.getElementById('editSelectedDate').value;
-        let url = '/sessions/' + date;
+        let url = '/gymtrackerapp/workout/sessions/' + date;
         fetch(url, {
             method: 'DELETE',
             headers: {

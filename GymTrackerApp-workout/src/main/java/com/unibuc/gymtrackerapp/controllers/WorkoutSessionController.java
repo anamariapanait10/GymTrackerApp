@@ -9,6 +9,7 @@ import com.unibuc.gymtrackerapp.services.WorkoutService;
 import com.unibuc.gymtrackerapp.services.WorkoutSessionService;
 import com.unibuc.gymtrackerapp.utils.UserAuthenticationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,12 +19,16 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/sessions")
 public class WorkoutSessionController {
+
+    @Value("${gymtrackerapp.gateway.base-url}")
+    private String gatewayBaseUrl;
 
     private final WorkoutSessionService workoutSessionService;
     private final WorkoutService workoutService;
@@ -60,17 +65,17 @@ public class WorkoutSessionController {
     @PostMapping
     public String saveWorkoutSession(@ModelAttribute WorkoutSession session) {
         String username = UserAuthenticationUtils.getLoggedUsername();
-        User user = userServiceProxy.getUserByEmail(username).block();
-        session.setUser(user);
+        UUID userId = userServiceProxy.getUserByEmail(username).block();
 
         WorkoutSession existingSession = workoutSessionService.getUserSessionByDate(username, session.getDate());
         if (existingSession != null) {
-            workoutSessionService.updateSession(existingSession.getId(), session);
-            return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+            workoutSessionService.updateSession(existingSession.getId(), session, userId);
+            return "redirect:" + gatewayBaseUrl + "/workout/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
         }
 
-        workoutSessionService.saveSession(session);
-        return "redirect:/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+        workoutSessionService.saveSession(session, userId);
+
+        return "redirect:" + gatewayBaseUrl + "/workout/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
     }
 
     @DeleteMapping("/{date}")

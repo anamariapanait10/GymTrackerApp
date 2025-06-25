@@ -13,7 +13,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Create New Exercise</h1>
 
-    <form th:action="@{/exercises}" method="post" th:object="${exercise}">
+    <form th:action="@{http://localhost:8071/gymtrackerapp/workout/exercises}" method="post" th:object="${exercise}">
         <div class="mb-3">
             <label for="name" class="form-label">Exercise Name</label>
             <input type="text" class="form-control" id="name" th:field="*{name}" required>
@@ -69,7 +69,7 @@
 
         <div class="mb-3">
             <button type="submit" class="btn btn-primary">Create Exercise</button>
-            <a th:href="@{/exercises}" class="btn btn-secondary">Cancel</a>
+            <a th:href="@{/gymtrackerapp/workout/exercises}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
@@ -84,13 +84,14 @@
             const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
             const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-            fetch('/api/muscleGroups', {
+            fetch('/gymtrackerapp/workout/api/muscleGroups', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     [header]: token
                 },
                 body: JSON.stringify({name: newGroupName}),
+                credentials: 'same-origin'
             })
                 .then(response => {
                     if (response.status !== 200) {

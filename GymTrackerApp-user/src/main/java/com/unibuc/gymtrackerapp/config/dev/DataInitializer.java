@@ -4,6 +4,7 @@ import com.unibuc.gymtrackerapp.domain.security.Authority;
 import com.unibuc.gymtrackerapp.domain.security.User;
 import com.unibuc.gymtrackerapp.repositories.AuthorityRepository;
 import com.unibuc.gymtrackerapp.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -14,21 +15,16 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.sql.SQLException;
 
-@Profile("dev")
 @Configuration
+@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
+    private final AuthorityRepository authorityRepository;
+    private final UserRepository userRepository;
 
-    private AuthorityRepository authorityRepository;
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-
-
-    private void loadUserData() throws IOException, SQLException {
+    private void loadUserData() throws SQLException {
         if (userRepository.count() == 0){
             Authority adminRole = authorityRepository.save(Authority.builder().role("ROLE_ADMIN").build());
 

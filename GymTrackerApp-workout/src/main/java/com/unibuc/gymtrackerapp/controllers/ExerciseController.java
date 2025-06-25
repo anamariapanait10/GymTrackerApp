@@ -7,6 +7,7 @@ import com.unibuc.gymtrackerapp.services.ExerciseService;
 import com.unibuc.gymtrackerapp.services.MuscleGroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +29,9 @@ public class ExerciseController {
     private final ExerciseService exerciseService;
     private final MuscleGroupService muscleGroupService;
 
+    @Value("${gymtrackerapp.gateway.base-url}")
+    private String gatewayBaseUrl;
+
     @GetMapping( "/create")
     public String showExercisesForm(Model model) {
         model.addAttribute("exercise", new Exercise());
@@ -42,7 +46,7 @@ public class ExerciseController {
             return "create-exercise";
         }
         exerciseService.saveExercise(exercise);
-        return "redirect:/exercises";
+        return "redirect:" + gatewayBaseUrl + "/workout/exercises";
     }
 
     @GetMapping

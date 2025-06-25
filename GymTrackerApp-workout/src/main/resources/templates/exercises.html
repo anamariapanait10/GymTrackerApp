@@ -11,7 +11,7 @@
 <div class="container my-5">
     <header class="mb-4">
         <h1 class="text-center">Exercises</h1>
-        <a class="btn btn-primary" th:href="@{/exercises/create}">Create New Exercise</a>
+        <a class="btn btn-primary" th:href="@{/gymtrackerapp/workout/exercises/create}">Create New Exercise</a>
     </header>
 
     <section>
@@ -21,7 +21,7 @@
                 <th>#</th>
                 <th>
                     Name
-                    <a th:href="@{/exercises(page=${pageNumber}, size=${pageSize}, sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
+                    <a th:href="@{/gymtrackerapp/workout/exercises(page=${pageNumber}, size=${pageSize}, sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
                        class="btn btn-sm btn-outline-light ms-2">
                         <span th:text="${sortDir == 'asc' ? '↓' : '↑'}"></span>
                     </a>
@@ -54,7 +54,7 @@
     </section>
 
     <div class="d-flex justify-content-end mb-3">
-        <form th:action="@{/exercises}" method="get">
+        <form th:action="@{http://localhost:8071/gymtrackerapp/workout/exercises}" method="get">
             <label for="pageSize" class="me-2">Items per page:</label>
             <select name="size" id="pageSize" class="form-select" style="width: auto; display: inline-block;" onchange="this.form.submit()">
                 <option value="2" th:selected="${ pageSize == 2}">2</option>
@@ -68,20 +68,20 @@
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${exercises.hasPrevious() ? '' : 'disabled'}">
                 <a class="page-link"
-                   th:href="@{/exercises(page=${exercises.number - 1}, size=${pageSize}, sortDir=${sortDir})}">
+                   th:href="@{/gymtrackerapp/workout/exercises(page=${exercises.number - 1}, size=${pageSize}, sortDir=${sortDir})}">
                     Previous
                 </a>
             </li>
             <li class="page-item" th:each="page : ${#numbers.sequence(1, exercises.totalPages)}"
                 th:classappend="${page == exercises.number + 1 ? 'active' : ''}">
                 <a class="page-link"
-                   th:href="@{/exercises(page=${page - 1}, size=${pageSize}, sortDir=${sortDir})}"
+                   th:href="@{/gymtrackerapp/workout/exercises(page=${page - 1}, size=${pageSize}, sortDir=${sortDir})}"
                    th:text="${page}">
                 </a>
             </li>
             <li class="page-item" th:classappend="${exercises.hasNext() ? '' : 'disabled'}">
                 <a class="page-link"
-                   th:href="@{/exercises(page=${exercises.number + 1}, size=${pageSize}, sortDir=${sortDir})}">
+                   th:href="@{/gymtrackerapp/workout/exercises(page=${exercises.number + 1}, size=${pageSize}, sortDir=${sortDir})}">
                     Next
                 </a>
             </li>
@@ -95,7 +95,7 @@
         const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch('/exercises/' + id + '/delete', {
+        fetch('/gymtrackerapp/workout/exercises/' + id + '/delete', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

@@ -13,7 +13,7 @@
     <!-- Page Header -->
     <header class="mb-4">
         <h1 class="text-center">Workouts</h1>
-        <a class="btn btn-primary" th:href="@{/workouts/create}">Create New Workout</a>
+        <a class="btn btn-primary" th:href="@{/gymtrackerapp/workout/workouts/create}">Create New Workout</a>
     </header>
 
     <section>
@@ -52,7 +52,7 @@
     </section>
 
     <div class="d-flex justify-content-end mb-3">
-        <form th:action="@{/workouts}" method="get">
+        <form th:action="@{http://localhost:8071/gymtrackerapp/workout/workouts}" method="get">
             <label for="pageSize" class="me-2">Items per page:</label>
             <select name="size" id="pageSize" class="form-select" style="width: auto; display: inline-block;" onchange="this.form.submit()">
                 <option value="2" th:selected="${ pageSize == 2}">2</option>
@@ -65,14 +65,14 @@
     <nav aria-label="Page navigation" th:if="${workouts.totalPages > 0}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${workouts.hasPrevious() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/workouts(page=${workouts.number - 1}, size=${pageSize})}">Previous</a>
+                <a class="page-link" th:href="@{/gymtrackerapp/workout/workouts(page=${workouts.number - 1}, size=${pageSize})}">Previous</a>
             </li>
             <li class="page-item" th:each="page : ${#numbers.sequence(1, workouts.totalPages)}"
                 th:classappend="${page == workouts.number + 1 ? 'active' : ''}">
-                <a class="page-link" th:href="@{/workouts(page=${page - 1}, size=${pageSize})}" th:text="${page}"></a>
+                <a class="page-link" th:href="@{/gymtrackerapp/workout/workouts(page=${page - 1}, size=${pageSize})}" th:text="${page}"></a>
             </li>
             <li class="page-item" th:classappend="${workouts.hasNext() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/workouts(page=${workouts.number + 1}, size=${pageSize})}">Next</a>
+                <a class="page-link" th:href="@{/gymtrackerapp/workout/workouts(page=${workouts.number + 1}, size=${pageSize})}">Next</a>
             </li>
         </ul>
     </nav>
@@ -85,7 +85,7 @@
         const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch('/workouts/' + id + '/delete', {
+        fetch('/gymtrackerapp/workout/workouts/' + id + '/delete', {
             method: 'DELETE',
             headers: {
                 [header]: token

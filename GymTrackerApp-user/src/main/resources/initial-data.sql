@@ -1,6 +1,6 @@
 INSERT INTO goal(deadline, target_weight, id, user_id, description)
 VALUES ('2025-12-31', 75.0, UNHEX(REPLACE(UUID(), '-', '')),
-        (SELECT id FROM user WHERE email = 'admin' LIMIT 1), 'Lose 5kg before the end of the year');
+        (SELECT id FROM user WHERE username = 'admin' LIMIT 1), 'Lose 5kg before the end of the year');
 
 INSERT INTO muscle_group (id, name)
 VALUES (UNHEX(REPLACE(UUID(), '-', '')), 'Chest'),
@@ -79,12 +79,12 @@ VALUES (UNHEX(REPLACE(UUID(), '-', '')), 'Full Body Routine', 'A general strengt
        (UNHEX(REPLACE(UUID(), '-', '')), 'Arm Blast', 'High-rep upper arm hypertrophy workout');
 
 INSERT INTO workout_session (id, user_id, workout_id, date, notes, status)
-VALUES (UNHEX(REPLACE(UUID(), '-', '')), (SELECT id FROM user WHERE email = 'admin' LIMIT 1),
+VALUES (UNHEX(REPLACE(UUID(), '-', '')), (SELECT id FROM user WHERE username = 'admin' LIMIT 1),
         (SELECT id FROM workout WHERE name = 'Full Body Routine' LIMIT 1), '2025-05-12', 'Felt strong today',
         'COMPLETED'),
-       (UNHEX(REPLACE(UUID(), '-', '')), (SELECT id FROM user WHERE email = 'admin' LIMIT 1),
+       (UNHEX(REPLACE(UUID(), '-', '')), (SELECT id FROM user WHERE username = 'admin' LIMIT 1),
         (SELECT id FROM workout WHERE name = 'Leg Day Routine' LIMIT 1), '2025-06-10', 'Heavy squat sets', 'COMPLETED'),
-       (UNHEX(REPLACE(UUID(), '-', '')), (SELECT id FROM user WHERE email = 'admin' LIMIT 1),
+       (UNHEX(REPLACE(UUID(), '-', '')), (SELECT id FROM user WHERE username = 'admin' LIMIT 1),
         (SELECT id FROM workout WHERE name = 'Arm Blast' LIMIT 1), '2025-06-11', 'Great pump today', 'SCHEDULED');
 
 INSERT INTO workout_set (id, workout_id, exercise_id, reps, weight)

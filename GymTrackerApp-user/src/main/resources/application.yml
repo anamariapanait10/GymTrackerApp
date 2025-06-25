@@ -25,3 +25,13 @@ management:
 gymtrackerapp:
   gateway:
     base-url: http://localhost:8071/gymtrackerapp
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        web: DEBUG
+        security.oauth2: DEBUG
+        security.oauth2.client: TRACE
+        security.oauth2.server.resource: TRACE

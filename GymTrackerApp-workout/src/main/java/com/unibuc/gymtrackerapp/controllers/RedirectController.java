@@ -3,12 +3,9 @@ package com.unibuc.gymtrackerapp.controllers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-
-import java.util.Objects;
 
 @Controller
 public class RedirectController {
@@ -21,10 +18,10 @@ public class RedirectController {
             return "redirect:" + gatewayBaseUrl + "/workout/sessions";
 
         String redirectUri = "http://localhost:8080/realms/gymtrackerapp/protocol/openid-connect/auth" +
-                    "?client_id=gymtrackerapp" +
-                    "&response_type=code" +
-                    "&scope=openid" +
-                    "&redirect_uri=http://localhost:8071/login/oauth2/code/gymtrackerapp";
+                "?client_id=gymtrackerapp" +
+                "&response_type=code" +
+                "&scope=openid" +
+                "&redirect_uri=http://localhost:8071/gymtrackerapp/workout/sessions";
 
         return "redirect:" + redirectUri;
     }
