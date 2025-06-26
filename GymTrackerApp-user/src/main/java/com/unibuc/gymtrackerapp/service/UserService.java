@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByUsername(email).orElse(null);
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

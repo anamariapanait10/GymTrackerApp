@@ -1,9 +1,7 @@
 package com.unibuc.gymtrackerapp.controllers;
 
-import com.unibuc.gymtrackerapp.domain.security.User;
 import com.unibuc.gymtrackerapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +19,7 @@ public class UserController {
 
     @GetMapping("/{email}")
     public Mono<UUID> getUserByEmail(@PathVariable String email) {
-        return Mono.just(userService.getUserByEmail(email).getId());
+        return Mono.just(userService.findByUsername(email).getId());
     }
 
 }
