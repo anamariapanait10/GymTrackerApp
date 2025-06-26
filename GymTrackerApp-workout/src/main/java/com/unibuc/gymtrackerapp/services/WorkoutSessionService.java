@@ -56,4 +56,18 @@ public class WorkoutSessionService {
         }
         return null;
     }
+
+    public WorkoutSession updateSessionFallback(UUID id, WorkoutSession updatedSession) {
+        WorkoutSession existingSession = sessionRepository.findById(id).orElse(null);
+        if (existingSession == null)
+            return null;
+
+        UUID userId = existingSession.getUser().getId();
+
+        updatedSession.setId(id);
+        WorkoutSession savedSession = sessionRepository.save(updatedSession);
+        sessionRepository.updateUserId(savedSession.getId(), userId);
+        return savedSession;
+
+    }
 }

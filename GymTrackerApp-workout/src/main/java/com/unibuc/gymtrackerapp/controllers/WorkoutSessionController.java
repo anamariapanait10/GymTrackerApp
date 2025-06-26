@@ -8,6 +8,7 @@ import com.unibuc.gymtrackerapp.services.UserServiceProxy;
 import com.unibuc.gymtrackerapp.services.WorkoutService;
 import com.unibuc.gymtrackerapp.services.WorkoutSessionService;
 import com.unibuc.gymtrackerapp.utils.UserAuthenticationUtils;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,9 +67,27 @@ public class WorkoutSessionController {
     }
 
     @PostMapping
+    @CircuitBreaker(name="saveWorkoutSession", fallbackMethod = "saveWorkoutSessionFallback")
     public String saveWorkoutSession(@ModelAttribute WorkoutSession session) {
         String username = UserAuthenticationUtils.getLoggedUsername();
         UUID userId = userServiceProxy.getUserByEmail(username).block();
+
+        WorkoutSession existingSession = workoutSessionService.getUserSessionByDate(username, session.getDate());
+        if (existingSession != null) {
+            workoutSessionService.updateSession(existingSession.getId(), session, userId);
+            return "redirect:" + gatewayBaseUrl + "/workout/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+        }
+
+        workoutSessionService.saveSession(session, userId);
+
+        return "redirect:" + gatewayBaseUrl + "/workout/sessions?year=" + session.getDate().getYear() + "&month=" + session.getDate().getMonthValue();
+    }
+
+    public String saveWorkoutSessionFallback(WorkoutSession session, Throwable throwable) {
+        log.error("Failed to save workout session: {}", throwable.getMessage());
+        String username = UserAuthenticationUtils.getLoggedUsername();
+
+        UUID userId = userServiceProxy.getUserIdByUsernameFallback(username);
 
         WorkoutSession existingSession = workoutSessionService.getUserSessionByDate(username, session.getDate());
         if (existingSession != null) {

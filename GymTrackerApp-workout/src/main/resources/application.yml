@@ -35,13 +35,13 @@ gymtrackerapp:
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-  level:
-    org:
-      springframework:
-        security: DEBUG
-        web: DEBUG
-        security.oauth2: DEBUG
-        security.oauth2.client: TRACE
-        security.oauth2.server.resource: TRACE
+#  level:
+#    org:
+#      springframework:
+#        security: DEBUG
+#        web: DEBUG
+#        security.oauth2: DEBUG
+#        security.oauth2.client: TRACE
+#        security.oauth2.server.resource: TRACE
 
 
