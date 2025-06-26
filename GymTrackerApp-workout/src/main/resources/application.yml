@@ -12,9 +12,6 @@ spring:
         jwt:
           jwk-set-uri: http://localhost:8080/realms/gymtrackerapp/protocol/openid-connect/certs
 
-server:
-  port: 8082
-
 management:
   tracing:
     sampling:
