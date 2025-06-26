@@ -9,6 +9,7 @@ import com.unibuc.gymtrackerapp.services.WorkoutService;
 import com.unibuc.gymtrackerapp.services.WorkoutSessionService;
 import com.unibuc.gymtrackerapp.utils.UserAuthenticationUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/sessions")
+@Slf4j
 public class WorkoutSessionController {
 
     @Value("${gymtrackerapp.gateway.base-url}")
@@ -36,8 +38,9 @@ public class WorkoutSessionController {
 
     @GetMapping
     public String showWorkoutsForm(@RequestParam(value = "year", required = false) Integer year,
-                                   @RequestParam(value = "month", required = false) Integer month, Model model) {
-
+                                   @RequestParam(value = "month", required = false) Integer month, Model model, @RequestHeader("awbd-id")
+                                       String correlationId) {
+        log.info("correlation-id discount: {}", correlationId);
         String username = UserAuthenticationUtils.getLoggedUsername();
 
         YearMonth currentMonth = (year != null && month != null)

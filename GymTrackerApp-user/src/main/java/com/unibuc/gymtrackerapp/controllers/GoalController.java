@@ -6,6 +6,7 @@ import com.unibuc.gymtrackerapp.exceptions.ResourceNotFoundException;
 import com.unibuc.gymtrackerapp.service.GoalService;
 import com.unibuc.gymtrackerapp.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/goals")
 @RequiredArgsConstructor
+@Slf4j
 public class GoalController {
 
     @Value("${gymtrackerapp.gateway.base-url}")
@@ -30,7 +32,8 @@ public class GoalController {
     private final UserService userService;
 
     @GetMapping
-    public String listGoals(Model model) {
+    public String listGoals(Model model,  @RequestHeader("awbd-id") String correlationId) {
+        log.info("correlation-id discount: {}", correlationId);
         List<Goal> goals = goalService.getAll();
         model.addAttribute("goals", goals);
         return "goals";
