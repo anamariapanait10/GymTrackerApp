@@ -1,48 +1,59 @@
-# Gym Tracker App
+# Gym Tracker App 🏋️
 
- Migrarea proiectului I la o arhitectura cu micro-servicii.
+Aplicația Gym Tracker App este o platformă web care permite utilizatorilor să 
+își stabilească obiective de fitness, să își planifice și să urmărească sesiunile 
+de antrenamente, să gestioneze exerciții și grupe musculare, totul într-un sistem 
+securizat, cu roluri și autentificare.
  
-I) Impartire in microservicii
+![DB diagram](https://github.com/anamariapanait10/GymTrackerApp/blob/main/db_diagram.jpeg)
 
-1.  User Service
-- Tabele: user, authority, user_authority
-- Funcționalitate:
-	- Gestionare conturi și autentificare
-	- Expunere endpointuri pentru login, register
+### I) Cerinte Proiect MVC
 
-2. Workout Service
-- Tabele: workout, workout_set, workout_session
+1. Relații între entități de toate tipurile ✔️
+2. Toate operațiile CRUD ✔️
+3. Folosirea de profile si doua baze de date diferite pentru testare si dev/prod ✔️
+- pt testare am folosit H2, iar pt prod/dev am folosit mysql
+- doua profile diferite pt test si dev
+4. Unit tests/intergation tests ✔️
+5. View-uri, formulare, validari, excepții ✔️
+6. Loguri, aspecte ✔️
+7. Paginare, sortare ✔️
+8. Spring Security ✔️
+ 
+### II) Proiect Microservicii
+1. Configurarea unitara a microserviciilor ✔️
 
-- Funcționalitate:
-	- CRUD pe antrenamente, seturi și sesiuni
+Proiectul a fost migrat la o arhitectură cu microservicii, folosind `Spring Cloud`. Cele doua microservicii
+sunt `User Service` și `Workout Service`, fiecare având propriile baze de date și responsabilități.
 
-3. Exercise Service
-- Tabele: exercise, muscle_group, exercise_muscle_group
+2. Comunicarea între microservicii, service discovery ✔️
 
-- Funcționalitate:
+Comunicare sincrona prin HTTP folosind WebClient și Eureka pentru service discovery.
 
-	- Gestiune exerciții
+Eureka: http://localhost:8761
 
-4. Goal Service
-- Tabel: goal
+3. Scalabilitate si load balancing ✔️
+4. Monitorizare, metrici, logging ✔️
 
-- Funcționalitate:
+Pentru monitorizare am folosit `Zipkin`.
+```
+curl -sSL https://zipkin.io/quickstart.sh | bash -s
+java -jar zipkin.jar
+```
+5. Securitate ✔️
 
-	- Gestiune obiective personale ale utilizatorului
+Pentru autentificare am folosit Keycloak.
 
+```
+docker run -d --name keycloak -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:23.0.7 start-dev
+```
+6. Rezilienta, servicii disponibile in caz de erori ✔️
 
-### Microservicii Suplimentare:
-🔹 Config Server
-Centralizează toate configurațiile .yml ale microserviciilor.
+In cazul in care user service nu este disponibil cand vrem ca adaugam un workout session va merge pe o metoda de fallback care ia id-ul userului direct din baza de date cu un query sql.
 
-🔹 Discovery Server (Eureka)
-Permite localizarea dinamică între servicii fără hardcoding de URL-uri.
-
-🔹 API Gateway
-Routează toate cererile către servicii
-
-Aplică autentificare și rate limiting
-
-
-
-
+7. Design pattern-uri ✔️
+- **API Gateway Pattern** - centralizează gestionarea cererilor către microservicii
+- **Service Discovery Pattern** - permite microserviciilor să se descopere reciproc
+- **Centralized Configuration Pattern** - gestionează configurațiile aplicației într-un singur loc
+- **Circuit Breaker Pattern** - detecteaza cand un serviciu este indisponibil si activeaza fallback logic
+- **DTO Pattern** - separa modelul de domeniu de datele trimise clientului
